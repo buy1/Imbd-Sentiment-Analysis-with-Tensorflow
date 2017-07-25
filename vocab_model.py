@@ -5,6 +5,7 @@ from nltk.corpus import stopwords
 import nltk.data
 import logging
 from gensim.models import word2vec
+import os
 # Read the data from files
 	
 #Takes in a raw_String and removes html elements and non alphabetical characters
@@ -25,6 +26,7 @@ def review_to_wordlist(review, remove_stopwords=False):
 	return (words)
 
 #tokenizes the review and setences and optionally removes the stopwords
+#TODO: add lemmatization
 def sent_tokenizer(review,remove_stopwords=False):
 	#changes a review to a list of sentences and each sentence is a a list of words
 	sentences=nltk.sent_tokenize(review)
@@ -39,9 +41,9 @@ def sent_tokenizer(review,remove_stopwords=False):
 	return tokenized_sent
 
 if __name__ == '__main__':
-	labeledpath="/Users/bhuang/Desktop/bagsof(words and popcorns)/data/labeledTrainData.tsv"
-	testpath="/Users/bhuang/Desktop/bagsof(words and popcorns)/data/testData.tsv"
-	unlabeled_path="/Users/bhuang/Desktop/bagsof(words and popcorns)/data/unlabeledTrainData.tsv"
+	labeledpath=os.getcwd()+"/data/labeledTrainData.tsv"
+	testpath=os.getcwd()+"/data/testData.tsv"
+	unlabeled_path=os.getcwd()+"/data/unlabeledTrainData.tsv"
 
 	traindata=pd.read_csv(labeledpath, header=0,delimiter="\t", quoting=3)
 	testdata=pd.read_csv(testpath,header=0,delimiter="\t",quoting=3)
@@ -54,7 +56,7 @@ if __name__ == '__main__':
 	sentences=[]
 	print ("Parsing sentences from training set")
 	for review in traindata["review"]:
-		sentences.append(sent_tokenizer(review))
+		sentences.append(sent_tokenizer(review,remove_stopwords=True))
 
 	print ("Parsing sentences from unlabeled set")
 	for review in unlabeled_traindata["review"]:
@@ -68,7 +70,7 @@ if __name__ == '__main__':
 	logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',level=logging.INFO)
 
 	num_features=300 #word vector dimensionality
-	min_word_count=40 #min word count
+	min_word_count=1 #min word count
 	num_workers=40 # number of threads run in parallel
 	context=10 #context window size
 	downsampling=1e-3 # downsample setting for frequent words

@@ -7,25 +7,26 @@ class rnn_BASIC_model(object):
 	"""
 	A RNN for predicting output based on long term dependancies.
 	"""
-	def __init__(self, data_size, num_layers,stddev_init, batch_size, state_size, num_steps, vocab_size, num_classes):
+	def __init__(self, data_size, num_layers,stddev_init, batch_size, state_size, num_steps, vocab_size, num_classes,initial_state):
 		self.batch_size = batch_size
 
 	  
-		cell_fn = tf.nn.rnn_cell.BasicLSTMCell
+		cell_fn = tf.nn.rnn_cell.GRUCell
 		
 		self.x = tf.placeholder(tf.int32, shape=[batch_size, num_steps], name="input_x")
 		self.y = tf.placeholder(tf.int32, shape=[batch_size], name='labels_placeholder')
+		# self.initial=tf.placeholder(tf.int32, shape=[vocab_size,state_size])
 		cell = cell_fn(state_size)
 		self.cell = cell = tf.nn.rnn_cell.MultiRNNCell([cell] * num_layers)
 	 
-		self.initial_state = cell.zero_state(batch_size, tf.float32)
+
 
 		#changes word to index and index to vector
 		with tf.device("/cpu:0"):
 			#randomize the initial variables of the matrix
-			embedding = tf.Variable(tf.random_uniform([vocab_size, state_size], -0.5, 0.5))
 			# a=input("a:")
-			rnn_inputs = [tf.squeeze(i) for i in tf.split( tf.nn.embedding_lookup(embedding, self.x),num_steps,1)]
+			# initial_state=self.initial
+			rnn_inputs = [tf.squeeze(i) for i in tf.split( tf.nn.embedding_lookup(initial_state, self.x),num_steps,1)]
 
 		rnn_outputs, last_state = tf.contrib.rnn.static_rnn(cell, rnn_inputs, dtype=tf.float32)
 

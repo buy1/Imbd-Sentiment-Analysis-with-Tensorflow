@@ -38,7 +38,7 @@ with tf.Graph().as_default():
 	with tf.Session(config=config) as sess:
 		batch_size=x_test.shape[0]
 		state1_size=100
-		MAXLEN = 30
+		MAXLEN = 300
 		num_classes=2
 		sqrt_0 = math.sqrt(1.0 / float(state1_size))
 		sqrt_1 = math.sqrt(1.0 / float(state1_size))
@@ -46,6 +46,8 @@ with tf.Graph().as_default():
 		data_size=x_test.shape[0]
 		vocab_size =101399
 		#use dropout or not
+
+		embedding = tf.Variable(tf.random_uniform([vocab_size, state1_size], -0.5, 0.5))
 		rnn = rnn_BASIC_model(batch_size =batch_size,
 						state_size =state1_size,
 						num_steps = MAXLEN,
@@ -53,23 +55,24 @@ with tf.Graph().as_default():
 						stddev_init = [sqrt_0, sqrt_1],
 						num_layers = num_layers,
 						data_size = data_size,
-						vocab_size = vocab_size)
+						vocab_size = vocab_size,
+						initial_state =embedding)
 	   
 		sess.run(tf.global_variables_initializer())
 		# print (rnn.predictions_label.shape)
 		# print (x_train.shape)
 		saver = tf.train.Saver(tf.global_variables())
-		saver.restore(sess,"LSTM_RNN_MODEL.ckpt")
+		saver.restore(sess,"LSTM_RNN_MODEL_12.ckpt")
 		x=prepare_data(x_test,MAXLEN)
 		prediction_label= sess.run([rnn.predictions_label],
 									{rnn.x: x})
 correct_answers=0
 prediction_label=prediction_label[0]
 
-for i in range(len(prediction_label)):
-	if prediction_label[i]==y_test[i]:
-		correct_answers+=1
-# correct_answers = (prediction_label) == np.array(y_test).sum()
+# for i in range(len(prediction_label)):
+# 	if prediction_label[i]==y_test[i]:
+# 		correct_answers+=1
+correct_answers = ((prediction_label) == np.array(y_test)).sum()
 print ("Accuracy: "+ str((correct_answers/batch_size)*100)+"%")
 # prediction_label=prediction_label[0]
 # testpath=os.getcwd()+"/data/testData.tsv"

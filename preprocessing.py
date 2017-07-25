@@ -30,7 +30,7 @@ def review_to_wordlist(review, remove_stopwords=False):
 		#removes the stopwords
 		words=[w for w in words if not w in stops]
 	return (words)
-
+#makes a 
 def makeFeatureVec(words, model, num_features,index2word_set):
 	#pre-initialize for speed
 	featureVec=np.zeros((num_features),dtype="float32")
@@ -60,7 +60,7 @@ def getAvgFeatureVecs(reviews, model, num_features):
 		counter+=1
 	return reviewFeatureVecs
 
-model=KeyedVectors.load('word2vec_model.bin')
+model=KeyedVectors.load_word2vec_format("glove-word2vec.bin", binary=True)
 
 labeledpath=os.getcwd()+"/data/labeledTrainData.tsv"
 testpath=os.getcwd()+"/data/testData.tsv"
@@ -98,9 +98,11 @@ x_unlabeled=[]
 for review in unlabeled_traindata:
 	x_unlabeled.append(review_to_wordlist(review,remove_stopwords=True))
 
-# num_features=300
-# word2vec_total=xtrain+xtest+x_unlabeled
-# dataVecs=getAvgFeatureVecs(word2vec_total,model,num_features)
+print ("Making Word2Vec vector")
+num_features=300
+dataVecs_xtrain=getAvgFeatureVecs(xtrain,model,num_features)
+dataVecs_xtest=getAvgFeatureVecs(xtest,model,num_features)
+dataVecs_x_unlabeled=getAvgFeatureVecs(x_unlabeled,model,num_features)
 
 print ("building vocab for xtrain")
 #makes a list of all unique vocab words
@@ -151,13 +153,16 @@ for review in local_xtest:
 		indexlist.append(vocab[word])
 	local_wordvector_xtest.append(indexlist)
 
+index2word_set=set(model.index2word)
+
 print ("Saving data...")
 
-# # Word2Vec Vector
-# f=h5py.File("wordVecs.hdf5","w")
-# dset=f.create_dataset("wordVecs",data=dataVecs)
-# dset=f.create_dataset("unlabeled",data=unlabeled_DataVecs)
-# f.close()
+# Word2Vec Vector
+f=h5py.File("wordVecs.hdf5","w")
+dset=f.create_dataset("xtest",data=dataVecs_xtest)
+dset1=f.create_dataset("xtrain",data=dataVecs_xtrain)
+dset2=f.create_dataset("x_unlabeled",data=dataVecs_x_unlabeled)
+f.close()
 
 #local test
 np.save("local_wordvector_xtest",np.array(local_wordvector_xtest))
