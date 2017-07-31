@@ -92,17 +92,17 @@ state1_size=100
 # Training parameters'
 batch_size=50
 #number of training steps
-nb_epochs=20
+nb_epochs=30
 #number of steps between every eval print
 eval_every=100
 #inital learning rate
-learning_rate=.0001
+learning_rate=.01
 # l2_reg_lambda=0.001
 num_steps=20
 num_classes=2
 num_layers=1
 
-MAXLEN = 300
+MAXLEN = 200
 vocab_size = 101399
 #use dropout or not
 is_training=True
@@ -117,7 +117,8 @@ dataVecs_xtest=model['xtest'][:]
 dataVecs_xtrain=model['xtrain'][:]
 dataVecs_x_unlabeled=model['x_unlabeled'][:]
 
-xtrain=dataVecs_xtrain=model['xtrain'][:]
+
+xtrain=dataVecs_xtrain[:]
 xtrain=xtrain[:,:100]
 pad=(0,vocab_size-xtrain.shape[0])
 xtrain=np.pad(xtrain,((0,vocab_size-xtrain.shape[0]),(0,0)),'constant',constant_values=(0))
@@ -156,7 +157,7 @@ with tf.Graph().as_default():
         global_step = tf.Variable(0)
         init_lr =learning_rate
 
-        optimizer = tf.train.AdamOptimizer(init_lr)
+        optimizer = tf.train.AdagradOptimizer(init_lr)
         train_step = optimizer.minimize(rnn.loss)
 
         tf.global_variables_initializer().run()
@@ -187,6 +188,8 @@ with tf.Graph().as_default():
                         print ("At step %d - Loss : %.3f  - Accuracy : %.3f " % (step, costs / step, correct_answers / (step * rnn.batch_size)))
             savePath=saver.save(sess,'LSTM_RNN_MODEL_'+str(count)+'.ckpt')
             count+=1
-        
-
+            #shuffles the data
+            arr=list(zip(labels,seqs))
+            np.random.shuffle(arr)
+            labels,seqs=zip(*arr)
 

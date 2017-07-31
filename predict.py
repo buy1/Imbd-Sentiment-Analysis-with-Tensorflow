@@ -38,7 +38,7 @@ with tf.Graph().as_default():
 	with tf.Session(config=config) as sess:
 		batch_size=x_test.shape[0]
 		state1_size=100
-		MAXLEN = 300
+		MAXLEN = 400
 		num_classes=2
 		sqrt_0 = math.sqrt(1.0 / float(state1_size))
 		sqrt_1 = math.sqrt(1.0 / float(state1_size))
@@ -62,7 +62,7 @@ with tf.Graph().as_default():
 		# print (rnn.predictions_label.shape)
 		# print (x_train.shape)
 		saver = tf.train.Saver(tf.global_variables())
-		saver.restore(sess,"LSTM_RNN_MODEL_12.ckpt")
+		saver.restore(sess,"LSTM_RNN_MODEL_19.ckpt")
 		x=prepare_data(x_test,MAXLEN)
 		prediction_label= sess.run([rnn.predictions_label],
 									{rnn.x: x})
