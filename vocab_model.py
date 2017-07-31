@@ -75,10 +75,10 @@ if __name__ == '__main__':
 	context=10 #context window size
 	downsampling=1e-3 # downsample setting for frequent words
 
-	print ("Training model...")
-	model = word2vec.Word2Vec(sentences, workers=num_workers, \
+	print (word2vec.Word2Vec(sentences, workers=num_workers, \
 	            size=num_features, min_count = min_word_count, \
-	            window = context, sample = downsampling)
+	            window = context, sample = downsampling)"Training model...")
+	model = 
 
 
 	model.init_sims(replace=True)

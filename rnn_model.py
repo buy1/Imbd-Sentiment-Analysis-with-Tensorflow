@@ -26,7 +26,7 @@ class rnn_BASIC_model(object):
 			#randomize the initial variables of the matrix
 			# a=input("a:")
 			# initial_state=self.initial
-			rnn_inputs = [tf.squeeze(i) for i in tf.split( tf.nn.embedding_lookup(initial_state, self.x),num_steps,1)]
+			rnn_inputs = [tf.squeeze(i) for i in tf.split(tf.nn.embedding_lookup(initial_state, self.x),num_steps,1)]
 
 		rnn_outputs, last_state = tf.contrib.rnn.static_rnn(cell, rnn_inputs, dtype=tf.float32)
 
